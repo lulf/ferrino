@@ -1,0 +1,12 @@
+[package]
+name = "blinky"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[dependencies]
+ferrino = { path = "../../" }
+
+[patch.crates-io]
+embassy-nrf = { version = "0.1.0", git = "https://github.com/embassy-rs/embassy.git", tag = "embassy-time-v0.1.0" }
