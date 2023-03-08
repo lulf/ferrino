@@ -21,10 +21,11 @@ cfg_if::cfg_if! {
         #[path="boards/microbit/mod.rs"]
         mod board;
         pub use board::*;
-        pub use board::Microbit as Board;
+        pub use board::Microbit as Device;
     }
 }
 
+/*
 pub struct Device {
     board: Board,
     _spawner: embassy_executor::Spawner,
@@ -42,8 +43,10 @@ impl Device {
         &mut self.board
     }
 }
+*/
 
 pub use embassy_executor;
+pub use embassy_executor::Spawner;
 pub use ferrino_macros::*;
 
 pub trait Button: Sized {

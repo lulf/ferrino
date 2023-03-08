@@ -28,8 +28,7 @@ pub fn cortex_m() -> TokenStream {
             let mut executor = ::ferrino::embassy_executor::Executor::new();
             let executor = unsafe { __make_static(&mut executor) };
             executor.run(|spawner| {
-                let device = Device::new(spawner);
-                spawner.must_spawn(__embassy_main(device));
+                spawner.must_spawn(__embassy_main(Device::default(), spawner));
             })
         }
     }
@@ -58,8 +57,7 @@ pub fn std() -> TokenStream {
             let executor = unsafe { __make_static(&mut executor) };
 
             executor.run(|spawner| {
-                let device = Device::new(spawner);
-                spawner.must_spawn(__embassy_main(device));
+                spawner.must_spawn(__embassy_main(Device::default(), spawner));
             })
         }
     }
@@ -104,8 +102,11 @@ pub fn run(
         },
     }
 
-    if fargs.len() != 1 {
-        ctxt.error_spanned_by(&f.sig, "main function must have 1 argument: the spawner.");
+    if fargs.len() != 2 {
+        ctxt.error_spanned_by(
+            &f.sig,
+            "main function must have 2 arguments: the device and the spawner.",
+        );
     }
 
     ctxt.check()?;
