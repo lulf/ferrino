@@ -1,6 +1,32 @@
 use std::{env, fs::File, io::Write, path::PathBuf};
 
 fn main() {
+    let target = env::var("TARGET").unwrap();
+
+    if target.starts_with("thumbv6m-") {
+        println!("cargo:rustc-cfg=cortex_m");
+        println!("cargo:rustc-cfg=armv6m");
+    } else if target.starts_with("thumbv7m-") {
+        println!("cargo:rustc-cfg=cortex_m");
+        println!("cargo:rustc-cfg=armv7m");
+    } else if target.starts_with("thumbv7em-") {
+        println!("cargo:rustc-cfg=cortex_m");
+        println!("cargo:rustc-cfg=armv7m");
+        println!("cargo:rustc-cfg=armv7em"); // (not currently used)
+    } else if target.starts_with("thumbv8m.base") {
+        println!("cargo:rustc-cfg=cortex_m");
+        println!("cargo:rustc-cfg=armv8m");
+        println!("cargo:rustc-cfg=armv8m_base");
+    } else if target.starts_with("thumbv8m.main") {
+        println!("cargo:rustc-cfg=cortex_m");
+        println!("cargo:rustc-cfg=armv8m");
+        println!("cargo:rustc-cfg=armv8m_main");
+    }
+
+    if target.ends_with("-eabihf") {
+        println!("cargo:rustc-cfg=has_fpu");
+    }
+
     let board_name = env::vars_os()
         .map(|(a, _)| a.to_string_lossy().to_string())
         .find(|x| x.starts_with("CARGO_FEATURE_BOARD+"))
@@ -12,7 +38,7 @@ fn main() {
         });
 
     if let Some(board_name) = board_name {
-        let data_dir = PathBuf::from(format!("../boards/{}", board_name));
+        let data_dir = PathBuf::from(format!("src/boards/{}", board_name));
         let in_memory_x = std::fs::read(data_dir.join("memory.x")).unwrap();
 
         gen_memory(&board_name, &in_memory_x[..]);
