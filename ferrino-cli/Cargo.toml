@@ -1,0 +1,11 @@
+[package]
+name = "ferrino-cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.1.8", features = ["derive"] }
+
+[[bin]]
+name = "ferrino"
+path = "src/main.rs"

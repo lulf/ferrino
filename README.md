@@ -11,3 +11,26 @@ Ferrino allows you to:
 
 Ferrino wires the board you have selected for your application, if it supports the required
 capabilities of the application. If not, you get a compile time error.
+
+## Usage
+
+To use ferrino, install the `ferrino` command line tool:
+
+```shell
+cargo install ferrino
+```
+
+NOTE: You can also use tools like `probe-run` with ferrino. The `ferrino` tool includes `probe-rs` just like `probe-run` but provides a simpler out-of-the-box experience.
+
+## Listing supported boards
+
+```bash
+ferrino --list-boards
+```
+
+## Running an example
+
+```bash
+cd examples/blinky
+ferrino run --board microbit
+```

@@ -263,6 +263,7 @@ name = "ferrino"
 version = "0.1.0"
 dependencies = [
  "cfg-if",
+ "cortex-m",
  "cortex-m-rt",
  "embassy-executor",
  "embedded-hal 1.0.0-alpha.9",

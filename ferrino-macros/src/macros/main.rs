@@ -28,7 +28,7 @@ pub fn cortex_m() -> TokenStream {
             let mut executor = ::ferrino::embassy_executor::Executor::new();
             let executor = unsafe { __make_static(&mut executor) };
             executor.run(|spawner| {
-                spawner.must_spawn(__embassy_main(Device::default(), spawner));
+                spawner.must_spawn(__embassy_main(spawner));
             })
         }
     }
@@ -57,7 +57,7 @@ pub fn std() -> TokenStream {
             let executor = unsafe { __make_static(&mut executor) };
 
             executor.run(|spawner| {
-                spawner.must_spawn(__embassy_main(Device::default(), spawner));
+                spawner.must_spawn(__embassy_main(spawner));
             })
         }
     }
@@ -78,12 +78,13 @@ pub fn run(
     if f.sig.asyncness.is_none() {
         ctxt.error_spanned_by(&f.sig, "main function must be async");
     }
+    /*
     if !f.sig.generics.params.is_empty() {
         ctxt.error_spanned_by(&f.sig, "main function must not be generic");
     }
     if !f.sig.generics.where_clause.is_none() {
         ctxt.error_spanned_by(&f.sig, "main function must not have `where` clauses");
-    }
+    }*/
     if !f.sig.abi.is_none() {
         ctxt.error_spanned_by(&f.sig, "main function must not have an ABI qualifier");
     }
@@ -113,10 +114,16 @@ pub fn run(
 
     let f_body = f.block;
     let out = &f.sig.output;
+    let generics = &f.sig.generics.params;
+    let w = &f.sig.generics.where_clause;
 
     let result = quote! {
         #[::ferrino::task()]
-        async fn __embassy_main(#fargs) #out {
+        async fn __embassy_main(spawner: ::ferrino::embassy_executor::Spawner) #out {
+            __embassy_run(::ferrino::Device::default(), spawner).await
+        }
+
+        async fn __embassy_run<#generics>(#fargs) #out #w {
             #f_body
         }
 

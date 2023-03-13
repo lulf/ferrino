@@ -1,4 +1,4 @@
-use embassy_nrf::gpio::{AnyPin, Input, Level, Output, OutputDrive, Pin, Pull};
+use embassy_nrf::gpio::{AnyPin, Input, Pin, Pull};
 
 pub struct Microbit {
     pub btn_a: Input<'static, AnyPin>,

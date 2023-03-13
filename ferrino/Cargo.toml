@@ -13,9 +13,9 @@ ferrino-macros = { path = "../ferrino-macros" }
 embassy-executor = { version = "0.1.0", path = "../../embassy/embassy-executor" }
 cfg-if = "1.0.0"
 cortex-m-rt = "0.7"
+cortex-m = "0.7"
 embassy-nrf = { version = "0.1.0", path = "../../embassy/embassy-nrf", features = ["nightly", "unstable-traits", "gpiote"], optional = true }
 
 [features]
 # Supported boards
-"board+microbit" = ["embassy-nrf/nrf52833"]
-
+"board+microbit" = ["embassy-nrf/nrf52833", "cortex-m/critical-section-single-core"]

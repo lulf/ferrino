@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "ferrino",
+    "ferrino-cli",
     "ferrino-macros",
 ]
 
