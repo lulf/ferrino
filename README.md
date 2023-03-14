@@ -13,7 +13,7 @@ Ferrino allows you to:
 Ferrino wires the board you have selected for your application, if it supports the required
 capabilities of the application. If not, you get a compile time error.
 
-Ferrino aims to support most common boards and development kits.
+Ferrino uses [Embassy](https://embassy.dev) as the underlying runtime and for the hardware support.
 
 ## Usage
 
