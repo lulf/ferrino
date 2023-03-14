@@ -21,12 +21,20 @@ enum Commands {
     ListBoards,
 }
 
-const BOARDS: &[(&str, &str, &str, &str)] = &[(
-    "microbit",
-    "ferrino/board+microbit",
-    "nRF52833_xxAA",
-    "thumbv7em-none-eabihf",
-)];
+const BOARDS: &[(&str, &str, &str, &str)] = &[
+    (
+        "microbit",
+        "ferrino/board+microbit",
+        "nRF52833_xxAA",
+        "thumbv7em-none-eabihf",
+    ),
+    (
+        "rpi-pico",
+        "ferrino/board+rpi-pico",
+        "RP2040",
+        "thumbv6m-none-eabi",
+    ),
+];
 
 fn main() {
     let cli = Cli::parse();

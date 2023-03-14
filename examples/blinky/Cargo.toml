@@ -1,0 +1,13 @@
+[package]
+name = "blinky"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[dependencies]
+ferrino = { path = "../../ferrino" }
+embedded-hal = "1.0.0-alpha.9"
+defmt = "0.3"
+defmt-rtt = "0.4"
+panic-reset = "0.1.1"

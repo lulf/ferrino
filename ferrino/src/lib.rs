@@ -21,12 +21,18 @@ cfg_if::cfg_if! {
         #[path="boards/microbit/mod.rs"]
         mod board;
         pub use board::*;
-        pub use board::Microbit as Device;
+        pub use board::Microbit as Board;
+    } else if #[cfg(feature = "board+rpi-pico")] {
+        #[path="boards/rpi-pico/mod.rs"]
+        mod board;
+        pub use board::*;
+        pub use board::RpiPico as Board;
     }
 }
 
 pub use embassy_executor;
 pub use embassy_executor::Spawner;
+pub use embassy_time::*;
 pub use ferrino_macros::*;
 
 pub trait Button: Sized {
@@ -36,7 +42,7 @@ pub trait Button: Sized {
 
 pub trait Led: Sized {
     type Led: embedded_hal::digital::OutputPin;
-    fn led(&mut self) -> Self::Led;
+    fn led(&mut self) -> &mut Self::Led;
 }
 
 pub trait Connectable: Sized {

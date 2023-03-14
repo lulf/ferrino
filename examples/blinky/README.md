@@ -1,4 +1,4 @@
-# example board-agnostic button
+# example board-agnostic blinky
 
 Command to build:
 

@@ -35,5 +35,5 @@ ferrino --list-boards
 
 ```bash
 cd examples/blinky
-ferrino run --board microbit
+ferrino run --board rp2040-pico-w
 ```
