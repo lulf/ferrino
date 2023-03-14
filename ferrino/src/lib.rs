@@ -25,26 +25,6 @@ cfg_if::cfg_if! {
     }
 }
 
-/*
-pub struct Device {
-    board: Board,
-    _spawner: embassy_executor::Spawner,
-}
-
-impl Device {
-    pub fn new(spawner: embassy_executor::Spawner) -> Self {
-        Self {
-            board: Board::default(),
-            _spawner: spawner,
-        }
-    }
-
-    pub fn peripherals(&mut self) -> &mut Board {
-        &mut self.board
-    }
-}
-*/
-
 pub use embassy_executor;
 pub use embassy_executor::Spawner;
 pub use ferrino_macros::*;
