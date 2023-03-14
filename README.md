@@ -6,11 +6,14 @@ type system and build system to build embedded applications.
 Ferrino allows you to:
 
 * Write a single application targeting multiple physical boards
-* Define capabilities for boards and
-* Depend on capabilities in your application
+* Depend on hardware capabilities instead of the hardware
+* Use a single cli for building, flashing, running and debugging firmware
+* Depend on a single Rust crate
 
 Ferrino wires the board you have selected for your application, if it supports the required
 capabilities of the application. If not, you get a compile time error.
+
+Ferrino aims to support most common boards and development kits.
 
 ## Usage
 
