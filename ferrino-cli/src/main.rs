@@ -10,6 +10,10 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    Build {
+        #[arg(short, long)]
+        board: String,
+    },
     Run {
         #[arg(short, long)]
         board: String,
@@ -31,6 +35,43 @@ fn main() {
             println!("Supported boards:");
             for b in BOARDS {
                 println!("\t{}", b.0);
+            }
+        }
+        Commands::Build { board } => {
+            let mut features = None;
+            let mut target = None;
+            for b in BOARDS {
+                if b.0 == board {
+                    features.replace(b.1.to_string());
+                    target.replace(b.3.to_string());
+                }
+            }
+
+            if features.is_none() || target.is_none() {
+                println!("Selected board not found: {}", board);
+                std::process::exit(-1);
+            }
+
+            let features = features.unwrap();
+            let target = target.unwrap();
+
+            let mut output = Command::new("cargo")
+                .arg("build")
+                .arg("--release")
+                .arg("--target")
+                .arg(target)
+                .arg("--features")
+                .arg(features)
+                .stdin(Stdio::inherit())
+                .stderr(Stdio::inherit())
+                .spawn()
+                .expect("error building firmware");
+
+            let status = output.wait();
+            if let Ok(code) = status {
+                exit(code.code().unwrap());
+            } else {
+                exit(-1)
             }
         }
         Commands::Run { board } => {
