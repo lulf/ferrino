@@ -21,7 +21,7 @@ impl Microbit {
     }
 }
 
-impl crate::Button for Microbit {
+impl crate::WithButtons for Microbit {
     type Pin = Input<'static, AnyPin>;
     fn button(&mut self) -> &mut Self::Pin {
         &mut self.btn_a

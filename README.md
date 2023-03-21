@@ -37,3 +37,7 @@ ferrino --list-boards
 cd examples/blinky
 ferrino run --board rp2040-pico-w
 ```
+
+## License
+
+MIT or Apache-2.0

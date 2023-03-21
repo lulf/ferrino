@@ -34,6 +34,12 @@ const BOARDS: &[(&str, &str, &str, &str)] = &[
         "RP2040",
         "thumbv6m-none-eabi",
     ),
+    (
+        "rpi-pico-w",
+        "ferrino/board+rpi-pico-w",
+        "RP2040",
+        "thumbv6m-none-eabi",
+    ),
 ];
 
 fn main() {

@@ -11,7 +11,7 @@ use panic_reset as _;
 use defmt_rtt as _;
 
 #[ferrino::main]
-async fn main(mut board: impl Button, _spawner: Spawner)
+async fn main(mut board: impl WithButtons, _spawner: Spawner)
 {
     loop {
         let _ = board.button().wait_for_any_edge().await;

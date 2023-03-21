@@ -18,9 +18,11 @@ impl RpiPico {
             led: Output::new(p.PIN_25.degrade(), Level::Low),
         }
     }
+
+    pub fn spawn_system(&mut self, _spawner: embassy_executor::Spawner) {}
 }
 
-impl crate::Led for RpiPico {
+impl crate::WithLeds for RpiPico {
     type Led = Output<'static, AnyPin>;
     fn led(&mut self) -> &mut Self::Led {
         &mut self.led

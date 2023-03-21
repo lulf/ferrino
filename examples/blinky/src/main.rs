@@ -10,7 +10,7 @@ use panic_reset as _;
 use defmt_rtt as _;
 
 #[ferrino::main]
-async fn main(mut board: impl Led, _spawner: Spawner)
+async fn main(mut board: impl WithLeds, _spawner: Spawner)
 {
     loop {
         let _ = board.led().set_high();

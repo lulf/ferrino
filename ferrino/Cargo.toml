@@ -15,10 +15,16 @@ cfg-if = "1.0.0"
 cortex-m-rt = "0.7"
 cortex-m = "0.7"
 embassy-nrf = { version = "0.1.0", path = "../../embassy/embassy-nrf", features = ["nightly", "unstable-traits", "gpiote", "time-driver-rtc1"], optional = true }
-embassy-rp = { version = "0.1.0", path = "../../embassy/embassy-rp", features = ["nightly", "unstable-traits", "time-driver"], optional = true }
+embassy-rp = { version = "0.1.0", path = "../../embassy/embassy-rp", features = ["nightly", "unstable-traits", "time-driver", "critical-section-impl"], optional = true }
 embassy-time = { version = "0.1.0", path = "../../embassy/embassy-time" }
+embassy-net = { version = "0.1.0", path = "../../embassy/embassy-net", features = ["dhcpv4", "tcp", "medium-ethernet", "dns", "unstable-traits", "nightly"], optional = true }
+embassy-net-driver-channel = { version = "0.1.0", path = "../../embassy/embassy-net-driver-channel", optional = true }
+embassy-net-driver = { version = "0.1.0", path = "../../embassy/embassy-net-driver", optional = true }
+cyw43 = { version = "0.1.0", path = "../../cyw43", features = ["defmt"], optional = true }
+static_cell = "1"
 
 [features]
 # Supported boards
 "board+microbit" = ["embassy-nrf/nrf52833", "cortex-m/critical-section-single-core"]
-"board+rpi-pico" = ["embassy-rp", "cortex-m/critical-section-single-core"]
+"board+rpi-pico" = ["embassy-rp"]
+"board+rpi-pico-w" = ["embassy-rp", "cyw43", "embassy-net", "embassy-net-driver-channel", "embassy-net-driver"]
