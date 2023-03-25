@@ -1,5 +1,7 @@
 use core::convert::Infallible;
-use embassy_executor::Executor;
+use core::future::Future;
+use core::mem::MaybeUninit;
+use embassy_executor::{Executor, Spawner};
 use embassy_net::{
     tcp::client::{TcpClient, TcpClientState},
     Stack as NetStack, StackResources,
@@ -10,7 +12,14 @@ use embassy_rp::peripherals::{PIN_23, PIN_24, PIN_25, PIN_29};
 use embedded_hal_async::spi::{ErrorType, ExclusiveDevice, SpiBusFlush, SpiBusRead, SpiBusWrite};
 use static_cell::StaticCell;
 
-pub struct RpiPicoW {}
+pub struct RpiPicoW {
+    wifi: Option<WifiPeripheral>,
+}
+
+struct WifiPeripheral {
+    pwr: Output<'static, PIN_23>,
+    spi: ExclusiveDevice<MySpi, Output<'static, PIN_25>>,
+}
 
 impl Default for RpiPicoW {
     fn default() -> Self {
@@ -25,9 +34,6 @@ impl RpiPicoW {
     pub fn new(config: embassy_rp::config::Config) -> Self {
         let p = embassy_rp::init(config);
 
-        let fw = unsafe { core::slice::from_raw_parts(0x10100000 as *const u8, 224190) };
-        let clm = unsafe { core::slice::from_raw_parts(0x10140000 as *const u8, 4752) };
-
         let pwr = Output::new(p.PIN_23, Level::Low);
         let cs = Output::new(p.PIN_25, Level::High);
         let clk = Output::new(p.PIN_29, Level::Low);
@@ -37,37 +43,51 @@ impl RpiPicoW {
 
         let bus = MySpi { clk, dio };
         let spi = ExclusiveDevice::new(bus, cs);
-
-        /*
-        static STATE: StaticCell<cyw43::State> = StaticCell::new();
-        let state = STATE.init(cyw43::State::new());
-        let (net_device, mut control, runner) = cyw43::new(state, pwr, spi, fw).await;
-
-        spawner.spawn(wifi_task(runner)).unwrap();
-
-        control.init(clm).await;
-        control
-            .set_power_management(cyw43::PowerManagementMode::PowerSave)
-            .await;
-
-        spawn_core1(p.CORE1, unsafe { &mut CORE1_STACK }, move || {
-            let executor1 = EXECUTOR1.init(Executor::new());
-            executor1.run(|spawner| {
-                spawner.spawn(cofigure_task(runner));
-                spawner.spawn(net_task(stack));
-            });
-        });
-        */
-        let board = Self {};
-        board
+        Self {
+            wifi: Some(WifiPeripheral { spi, pwr }),
+        }
     }
 
-    pub fn spawn_system(&mut self, _spawner: embassy_executor::Spawner) {}
+    pub fn spawn(&mut self, spawner: Spawner) {
+        let peri = self.wifi.take().unwrap();
+
+        spawner.spawn(system(peri, spawner));
+    }
 }
 
-// Executor running the network stack on the second core
-static EXECUTOR1: StaticCell<Executor> = StaticCell::new();
-static mut CORE1_STACK: Stack<4096> = Stack::new();
+static STATE: StaticCell<cyw43::State> = StaticCell::new();
+static RESOURCES: StaticCell<StackResources<4>> = StaticCell::new();
+static mut STACK: MaybeUninit<NetStack<NetDriver>> = MaybeUninit::uninit();
+static mut CONTROL: MaybeUninit<cyw43::Control<'static>> = MaybeUninit::uninit();
+
+#[embassy_executor::task]
+async fn system(peri: WifiPeripheral, spawner: Spawner) {
+    let fw = unsafe { core::slice::from_raw_parts(0x10100000 as *const u8, 224190) };
+    let clm = unsafe { core::slice::from_raw_parts(0x10140000 as *const u8, 4752) };
+
+    let state = STATE.init(cyw43::State::new());
+    let (net_device, mut control, runner) = cyw43::new(state, peri.pwr, peri.spi, fw).await;
+
+    spawner.spawn(wifi_task(runner)).unwrap();
+
+    control.init(clm).await;
+    control
+        .set_power_management(cyw43::PowerManagementMode::PowerSave)
+        .await;
+
+    unsafe { CONTROL.write(control) };
+
+    let config = embassy_net::Config::Dhcp(Default::default());
+
+    // Generate random seed
+    let seed = 0x0123_4567_89ab_cdef; // chosen by fair dice roll. guarenteed to be random.
+
+    let resources = RESOURCES.init(StackResources::new());
+
+    let stack = unsafe { STACK.write(NetStack::new(net_device, config, resources, seed)) };
+
+    stack.run().await
+}
 
 #[embassy_executor::task]
 async fn wifi_task(
@@ -80,24 +100,24 @@ async fn wifi_task(
     runner.run().await
 }
 
-/*
-#[embassy_executor::task]
-async fn net_task(stack: &'static Stack<cyw43::NetDriver<'static>>) -> ! {
-    stack.run().await
-}*/
-/*
-impl crate::Led for RpiPicoW {
-    type Led = Output<'static, AnyPin>;
-    fn led(&mut self) -> &mut Self::Led {
-        &mut self.led
-    }
-}
-*/
+static CLIENT_STATE: TcpClientState<2, 1024, 1024> = TcpClientState::new();
 
 impl crate::WithTcp for RpiPicoW {
+    type Error = ();
     type TcpClient = TcpClient<'static, NetDriver, 2>;
-    fn client(&mut self) -> Self::TcpClient {
-        todo!()
+    fn client(&mut self) -> Result<Self::TcpClient, Self::Error> {
+        let stack = unsafe { STACK.assume_init_ref() };
+        let client = TcpClient::new(stack, &CLIENT_STATE);
+        Ok(client)
+    }
+}
+
+impl crate::WithWifi for RpiPicoW {
+    type Error = ();
+    async fn join_wifi(&mut self, ssid: &str, key: &str) -> Result<(), Self::Error> {
+        let control = unsafe { CONTROL.assume_init_mut() };
+        control.join_wpa2(ssid, key).await;
+        Ok(())
     }
 }
 

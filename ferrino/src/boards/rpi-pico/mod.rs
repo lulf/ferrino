@@ -19,7 +19,7 @@ impl RpiPico {
         }
     }
 
-    pub fn spawn_system(&mut self, _spawner: embassy_executor::Spawner) {}
+    pub fn spawn(&mut self, _spawner: Spawner) {}
 }
 
 impl crate::WithLeds for RpiPico {

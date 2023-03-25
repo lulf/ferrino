@@ -19,6 +19,8 @@ impl Microbit {
             btn_b: Input::new(p.P0_23.degrade(), Pull::Up),
         }
     }
+
+    pub fn spawn(&mut self, _spawner: Spawner) {}
 }
 
 impl crate::WithButtons for Microbit {

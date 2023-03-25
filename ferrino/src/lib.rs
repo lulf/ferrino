@@ -54,6 +54,12 @@ pub trait WithLeds: Sized {
 }
 
 pub trait WithTcp: Sized {
+    type Error: core::fmt::Debug;
     type TcpClient: embedded_nal_async::TcpConnect;
-    fn client(&mut self) -> Self::TcpClient;
+    fn client(&mut self) -> Result<Self::TcpClient, Self::Error>;
+}
+
+pub trait WithWifi: Sized {
+    type Error: core::fmt::Debug;
+    async fn join_wifi(&mut self, ssid: &str, key: &str) -> Result<(), Self::Error>;
 }
