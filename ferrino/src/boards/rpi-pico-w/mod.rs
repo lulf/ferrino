@@ -1,37 +1,29 @@
 use core::convert::Infallible;
-use core::future::Future;
 use core::mem::MaybeUninit;
-use embassy_executor::{Executor, Spawner};
+use embassy_executor::{Spawner};
 use embassy_net::{
     tcp::client::{TcpClient, TcpClientState},
     Stack as NetStack, StackResources,
 };
-use embassy_rp::gpio::{AnyPin, Flex, Level, Output, Pin};
-use embassy_rp::multicore::{spawn_core1, Stack};
-use embassy_rp::peripherals::{PIN_23, PIN_24, PIN_25, PIN_29};
+use embassy_rp::gpio::{Flex, Level, Output};
+use embassy_rp::peripherals::{PIN_23, PIN_24, PIN_25, PIN_29, USB};
 use embedded_hal_async::spi::{ErrorType, ExclusiveDevice, SpiBusFlush, SpiBusRead, SpiBusWrite};
 use static_cell::StaticCell;
+use embassy_rp::usb::Driver;
+use embassy_rp::interrupt;
 
-pub struct RpiPicoW {
-    wifi: Option<WifiPeripheral>,
-}
+pub struct RpiPicoW {}
 
 struct WifiPeripheral {
     pwr: Output<'static, PIN_23>,
     spi: ExclusiveDevice<MySpi, Output<'static, PIN_25>>,
 }
 
-impl Default for RpiPicoW {
-    fn default() -> Self {
-        Self::new(Default::default())
-    }
-}
-
 type NetDriver = cyw43::NetDriver<'static>;
 
 impl RpiPicoW {
     /// Create a new instance based on HAL configuration
-    pub fn new(config: embassy_rp::config::Config) -> Self {
+    pub fn spawn(config: embassy_rp::config::Config, spawner: Spawner) -> Self {
         let p = embassy_rp::init(config);
 
         let pwr = Output::new(p.PIN_23, Level::Low);
@@ -43,15 +35,19 @@ impl RpiPicoW {
 
         let bus = MySpi { clk, dio };
         let spi = ExclusiveDevice::new(bus, cs);
-        Self {
-            wifi: Some(WifiPeripheral { spi, pwr }),
-        }
-    }
 
-    pub fn spawn(&mut self, spawner: Spawner) {
-        let peri = self.wifi.take().unwrap();
+        let irq = interrupt::take!(USBCTRL_IRQ);
+        let driver = Driver::new(p.USB, irq);
 
-        spawner.spawn(system(peri, spawner));
+        let peri = WifiPeripheral {
+            pwr,
+            spi
+        };
+
+        spawner.spawn(logger_task(driver)).unwrap();
+        spawner.spawn(system(peri, spawner)).unwrap();
+
+        Self {}
     }
 }
 
@@ -83,10 +79,14 @@ async fn system(peri: WifiPeripheral, spawner: Spawner) {
     let seed = 0x0123_4567_89ab_cdef; // chosen by fair dice roll. guarenteed to be random.
 
     let resources = RESOURCES.init(StackResources::new());
-
     let stack = unsafe { STACK.write(NetStack::new(net_device, config, resources, seed)) };
 
     stack.run().await
+}
+
+#[embassy_executor::task]
+async fn logger_task(driver: Driver<'static, USB>) {
+    embassy_usb_logger::run!(1024, log::LevelFilter::Info, driver);
 }
 
 #[embassy_executor::task]

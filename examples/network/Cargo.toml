@@ -1,5 +1,5 @@
 [package]
-name = "blinky"
+name = "network"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,12 +9,12 @@ edition = "2021"
 ferrino = { path = "../../ferrino" }
 embedded-hal = "1.0.0-alpha.9"
 embedded-nal-async = "0.4.0"
+embedded-io = "0.4.0"
 defmt = "0.3"
 defmt-rtt = "0.4"
 panic-reset = "0.1.1"
 
 [patch.crates-io]
 embassy-executor = { path = "../../../embassy/embassy-executor" }
-embassy-net = { path = "../../../embassy/embassy-net" }
 embassy-net-driver-channel = { path = "../../../embassy/embassy-net-driver-channel" }
 embassy-net-driver = { path = "../../../embassy/embassy-net-driver" }

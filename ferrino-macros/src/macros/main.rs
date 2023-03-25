@@ -120,8 +120,7 @@ pub fn run(
     let result = quote! {
         #[::ferrino::task()]
         async fn __embassy_main(spawner: ::ferrino::embassy_executor::Spawner) #out {
-            let mut board = ::ferrino::Board::default();
-            board.spawn(spawner);
+            let mut board = ::ferrino::Board::spawn(Default::default(), spawner);
             __embassy_run(board, spawner).await
         }
 

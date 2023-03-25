@@ -20,8 +20,10 @@ embassy-time = { version = "0.1.0", path = "../../embassy/embassy-time" }
 embassy-net = { version = "0.1.0", path = "../../embassy/embassy-net", features = ["dhcpv4", "tcp", "medium-ethernet", "dns", "unstable-traits", "nightly"], optional = true }
 embassy-net-driver-channel = { version = "0.1.0", path = "../../embassy/embassy-net-driver-channel", optional = true }
 embassy-net-driver = { version = "0.1.0", path = "../../embassy/embassy-net-driver", optional = true }
+embassy-usb-logger = { version = "0.1.0", path = "../../embassy/embassy-usb-logger" }
 cyw43 = { version = "0.1.0", path = "../../cyw43", features = ["defmt"], optional = true }
 static_cell = "1"
+log = "0.4"
 
 [features]
 # Supported boards
