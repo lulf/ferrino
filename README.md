@@ -15,6 +15,8 @@ capabilities of the application. If not, you get a compile time error.
 
 Ferrino uses [Embassy](https://embassy.dev) as the underlying runtime and for the hardware support.
 
+TODO: generate an embassy project from any ferrino project using the `ferrino` command line tool.
+
 ## Usage
 
 To use ferrino, install the `ferrino` command line tool:
