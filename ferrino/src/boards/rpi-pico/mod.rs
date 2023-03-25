@@ -1,25 +1,18 @@
+use embassy_executor::Spawner;
 use embassy_rp::gpio::{AnyPin, Level, Output, Pin};
 
 pub struct RpiPico {
     pub led: Output<'static, AnyPin>,
 }
 
-impl Default for RpiPico {
-    fn default() -> Self {
-        Self::new(Default::default())
-    }
-}
-
 impl RpiPico {
     /// Create a new instance based on HAL configuration
-    pub fn new(config: embassy_rp::config::Config) -> Self {
+    pub fn spawn(config: embassy_rp::config::Config, _s: Spawner) -> Self {
         let p = embassy_rp::init(config);
         Self {
             led: Output::new(p.PIN_25.degrade(), Level::Low),
         }
     }
-
-    pub fn spawn(&mut self, _spawner: Spawner) {}
 }
 
 impl crate::WithLeds for RpiPico {

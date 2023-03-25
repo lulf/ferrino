@@ -1,26 +1,20 @@
+use embassy_executor::Spawner;
 use embassy_nrf::gpio::{AnyPin, Input, Pin, Pull};
 
 pub struct Microbit {
     pub btn_a: Input<'static, AnyPin>,
     pub btn_b: Input<'static, AnyPin>,
 }
-impl Default for Microbit {
-    fn default() -> Self {
-        Self::new(Default::default())
-    }
-}
 
 impl Microbit {
     /// Create a new instance based on HAL configuration
-    pub fn new(config: embassy_nrf::config::Config) -> Self {
+    pub fn spawn(config: embassy_nrf::config::Config, _s: Spawner) -> Self {
         let p = embassy_nrf::init(config);
         Self {
             btn_a: Input::new(p.P0_14.degrade(), Pull::Up),
             btn_b: Input::new(p.P0_23.degrade(), Pull::Up),
         }
     }
-
-    pub fn spawn(&mut self, _spawner: Spawner) {}
 }
 
 impl crate::WithButtons for Microbit {
