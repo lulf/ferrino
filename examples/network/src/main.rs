@@ -8,13 +8,16 @@ use embedded_nal_async::{TcpConnect};
 use embedded_io::asynch::{Write, Read};
 
 use defmt_rtt as _;
-use panic_reset as _;
+//use panic_reset as _;
+use panic_probe as _;
 
 const WIFI_SSID: &str = ""; //include_str!("wifi.ssid");
 const WIFI_PSK: &str = ""; //include_str!("wifi.psk");
 
 #[ferrino::main]
 async fn main(mut board: impl WithTcp + WithWifi, _spawner: Spawner) {
+    defmt::info!("Application started");
+    Timer::after(Duration::from_secs(10)).await;
     defmt::info!("Joining wifi...");
     let _ = board.join_wifi(WIFI_SSID.trim_end(), WIFI_PSK.trim_end()).await.unwrap();
 

@@ -28,10 +28,12 @@ impl RpiPicoW {
     pub async fn spawn(config: embassy_rp::config::Config, spawner: Spawner) -> Self {
         let p = embassy_rp::init(config);
 
+        defmt::trace!("Board init");
         let irq = interrupt::take!(USBCTRL_IRQ);
         let driver = Driver::new(p.USB, irq);
         spawner.spawn(logger_task(driver)).unwrap();
 
+        defmt::trace!("USB spawned");
         let pwr = Output::new(p.PIN_23, Level::Low);
         let cs = Output::new(p.PIN_25, Level::High);
         let clk = Output::new(p.PIN_29, Level::Low);
@@ -41,13 +43,16 @@ impl RpiPicoW {
 
         let bus = MySpi { clk, dio };
         let spi = ExclusiveDevice::new(bus, cs);
+        defmt::trace!("SPI Cconfigured");
 
         let fw = unsafe { core::slice::from_raw_parts(0x10100000 as *const u8, 224190) };
         let clm = unsafe { core::slice::from_raw_parts(0x10140000 as *const u8, 4752) };
 
         let state = STATE.init(cyw43::State::new());
+        defmt::trace!("Initializing driver");
         let (net_device, mut control, runner) = cyw43::new(state, pwr, spi, fw).await;
 
+        defmt::trace!("Spawn wifi task");
         spawner.spawn(wifi_task(runner)).unwrap();
 
 
@@ -64,6 +69,7 @@ impl RpiPicoW {
         let resources = RESOURCES.init(StackResources::new());
         let stack = STACK.init(NetStack::new(net_device, config, resources, seed));
 
+        defmt::trace!("Spawn net task");
         spawner.spawn(net_task(stack)).unwrap();
 
         Self {

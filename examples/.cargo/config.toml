@@ -12,3 +12,6 @@ rustflags = [
   "-C", "no-vectorize-loops",
   "-Z", "emit-stack-sizes",
 ]
+
+[env]
+DEFMT_LOG = "trace"

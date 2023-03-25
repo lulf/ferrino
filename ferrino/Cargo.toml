@@ -24,6 +24,7 @@ embassy-usb-logger = { version = "0.1.0", path = "../../embassy/embassy-usb-logg
 cyw43 = { version = "0.1.0", path = "../../cyw43", features = ["defmt"], optional = true }
 static_cell = "1"
 log = "0.4"
+defmt = "0.3"
 
 [features]
 # Supported boards
