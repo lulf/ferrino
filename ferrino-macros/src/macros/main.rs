@@ -116,7 +116,7 @@ pub fn run(args: syn::AttributeArgs, f: syn::ItemFn, main: TokenStream) -> Resul
     let result = quote! {
         #[::ferrino::task()]
         async fn __embassy_main(spawner: ::ferrino::embassy_executor::Spawner) #out {
-            let mut board = ::ferrino::Board::spawn(Default::default(), spawner);
+            let mut board = ::ferrino::Board::spawn(Default::default(), spawner).await;
             __embassy_run(board, spawner).await
         }
 

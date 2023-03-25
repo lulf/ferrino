@@ -8,7 +8,7 @@ pub struct Microbit {
 
 impl Microbit {
     /// Create a new instance based on HAL configuration
-    pub fn spawn(config: embassy_nrf::config::Config, _s: Spawner) -> Self {
+    pub async fn spawn(config: embassy_nrf::config::Config, _s: Spawner) -> Self {
         let p = embassy_nrf::init(config);
         Self {
             btn_a: Input::new(p.P0_14.degrade(), Pull::Up),
