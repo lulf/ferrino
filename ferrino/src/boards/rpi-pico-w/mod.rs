@@ -1,16 +1,15 @@
 use core::convert::Infallible;
 use core::mem::MaybeUninit;
+
 use embassy_executor::Spawner;
-use embassy_net::{
-    tcp::client::{TcpClient, TcpClientState},
-    Stack as NetStack, StackResources,
-};
+use embassy_net::tcp::client::{TcpClient, TcpClientState};
+use embassy_net::{Stack as NetStack, StackResources};
 use embassy_rp::gpio::{Flex, Level, Output};
+use embassy_rp::interrupt;
 use embassy_rp::peripherals::{PIN_23, PIN_24, PIN_25, PIN_29, USB};
+use embassy_rp::usb::Driver;
 use embedded_hal_async::spi::{ErrorType, ExclusiveDevice, SpiBusFlush, SpiBusRead, SpiBusWrite};
 use static_cell::StaticCell;
-use embassy_rp::usb::Driver;
-use embassy_rp::interrupt;
 
 pub struct RpiPicoW {}
 
@@ -39,10 +38,7 @@ impl RpiPicoW {
         let irq = interrupt::take!(USBCTRL_IRQ);
         let driver = Driver::new(p.USB, irq);
 
-        let peri = WifiPeripheral {
-            pwr,
-            spi
-        };
+        let peri = WifiPeripheral { pwr, spi };
 
         spawner.spawn(logger_task(driver)).unwrap();
         spawner.spawn(system(peri, spawner)).unwrap();
@@ -91,11 +87,7 @@ async fn logger_task(driver: Driver<'static, USB>) {
 
 #[embassy_executor::task]
 async fn wifi_task(
-    runner: cyw43::Runner<
-        'static,
-        Output<'static, PIN_23>,
-        ExclusiveDevice<MySpi, Output<'static, PIN_25>>,
-    >,
+    runner: cyw43::Runner<'static, Output<'static, PIN_23>, ExclusiveDevice<MySpi, Output<'static, PIN_25>>>,
 ) -> ! {
     runner.run().await
 }

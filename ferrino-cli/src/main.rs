@@ -1,5 +1,6 @@
-use clap::{Parser, Subcommand};
 use std::process::{exit, Command, Stdio};
+
+use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -28,18 +29,8 @@ const BOARDS: &[(&str, &str, &str, &str)] = &[
         "nRF52833_xxAA",
         "thumbv7em-none-eabihf",
     ),
-    (
-        "rpi-pico",
-        "ferrino/board+rpi-pico",
-        "RP2040",
-        "thumbv6m-none-eabi",
-    ),
-    (
-        "rpi-pico-w",
-        "ferrino/board+rpi-pico-w",
-        "RP2040",
-        "thumbv6m-none-eabi",
-    ),
+    ("rpi-pico", "ferrino/board+rpi-pico", "RP2040", "thumbv6m-none-eabi"),
+    ("rpi-pico-w", "ferrino/board+rpi-pico-w", "RP2040", "thumbv6m-none-eabi"),
 ];
 
 fn main() {

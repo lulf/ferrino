@@ -1,4 +1,7 @@
-use std::{env, fs::File, io::Write, path::PathBuf};
+use std::env;
+use std::fs::File;
+use std::io::Write;
+use std::path::PathBuf;
 
 fn main() {
     let target = env::var("TARGET").unwrap();
@@ -49,16 +52,9 @@ fn main() {
 
         std::fs::create_dir_all(format!("{}/boards/{}", out_dir.display(), board_name)).unwrap();
         let out_memory_x = format!("{}/boards/{}/memory.x", out_dir.display(), board_name);
-        File::create(&out_memory_x)
-            .unwrap()
-            .write_all(in_memory_x)
-            .unwrap();
+        File::create(&out_memory_x).unwrap().write_all(in_memory_x).unwrap();
 
         println!("cargo:rerun-if-changed=build.rs");
-        println!(
-            "cargo:rustc-link-search={}/boards/{}",
-            out_dir.display(),
-            board_name
-        );
+        println!("cargo:rustc-link-search={}/boards/{}", out_dir.display(), board_name);
     }
 }

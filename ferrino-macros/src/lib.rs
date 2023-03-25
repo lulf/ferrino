@@ -66,9 +66,7 @@ pub fn task(args: TokenStream, item: TokenStream) -> TokenStream {
 pub fn main_cortex_m(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(args as syn::AttributeArgs);
     let f = syn::parse_macro_input!(item as syn::ItemFn);
-    main::run(args, f, main::cortex_m())
-        .unwrap_or_else(|x| x)
-        .into()
+    main::run(args, f, main::cortex_m()).unwrap_or_else(|x| x).into()
 }
 
 /// Creates a new `executor` instance and declares an application entry point for RISC-V spawning the corresponding function body as an async task.
@@ -93,9 +91,7 @@ pub fn main_cortex_m(args: TokenStream, item: TokenStream) -> TokenStream {
 pub fn main_riscv(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(args as syn::AttributeArgs);
     let f = syn::parse_macro_input!(item as syn::ItemFn);
-    main::run(args, f, main::riscv())
-        .unwrap_or_else(|x| x)
-        .into()
+    main::run(args, f, main::riscv()).unwrap_or_else(|x| x).into()
 }
 
 /// Creates a new `executor` instance and declares an application entry point for STD spawning the corresponding function body as an async task.
@@ -145,26 +141,20 @@ pub fn main_std(args: TokenStream, item: TokenStream) -> TokenStream {
 pub fn main_wasm(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(args as syn::AttributeArgs);
     let f = syn::parse_macro_input!(item as syn::ItemFn);
-    main::run(args, f, main::wasm())
-        .unwrap_or_else(|x| x)
-        .into()
+    main::run(args, f, main::wasm()).unwrap_or_else(|x| x).into()
 }
 
 #[proc_macro_attribute]
 pub fn cortex_m_interrupt(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(args as syn::AttributeArgs);
     let f = syn::parse_macro_input!(item as syn::ItemFn);
-    cortex_m_interrupt::run(args, f)
-        .unwrap_or_else(|x| x)
-        .into()
+    cortex_m_interrupt::run(args, f).unwrap_or_else(|x| x).into()
 }
 
 #[proc_macro]
 pub fn cortex_m_interrupt_declare(item: TokenStream) -> TokenStream {
     let name = syn::parse_macro_input!(item as syn::Ident);
-    cortex_m_interrupt_declare::run(name)
-        .unwrap_or_else(|x| x)
-        .into()
+    cortex_m_interrupt_declare::run(name).unwrap_or_else(|x| x).into()
 }
 
 /// # interrupt_take procedural macro
@@ -175,7 +165,5 @@ pub fn cortex_m_interrupt_declare(item: TokenStream) -> TokenStream {
 #[proc_macro]
 pub fn cortex_m_interrupt_take(item: TokenStream) -> TokenStream {
     let name = syn::parse_macro_input!(item as syn::Ident);
-    cortex_m_interrupt_take::run(name)
-        .unwrap_or_else(|x| x)
-        .into()
+    cortex_m_interrupt_take::run(name).unwrap_or_else(|x| x).into()
 }

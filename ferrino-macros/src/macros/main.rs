@@ -63,11 +63,7 @@ pub fn std() -> TokenStream {
     }
 }
 
-pub fn run(
-    args: syn::AttributeArgs,
-    f: syn::ItemFn,
-    main: TokenStream,
-) -> Result<TokenStream, TokenStream> {
+pub fn run(args: syn::AttributeArgs, f: syn::ItemFn, main: TokenStream) -> Result<TokenStream, TokenStream> {
     #[allow(unused_variables)]
     let args = Args::from_list(&args).map_err(|e| e.write_errors())?;
 
